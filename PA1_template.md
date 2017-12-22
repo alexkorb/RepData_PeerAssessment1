@@ -8,7 +8,8 @@ output:
 
 ## Loading and preprocessing the data
 Load the date, and change the dates to actual dates.
-```{r}
+
+```r
 x<-read.csv("activity.csv")
 x$date<-as.Date(as.character(x$date))
 options(scipen=999)
@@ -16,27 +17,40 @@ options(scipen=999)
 
 ## What is mean total number of steps taken per day?
 
-```{r}
+
+```r
 stepsbydate<-aggregate( steps ~ date, x, sum )
 hist(stepsbydate$steps)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
 stepmean<-format(summary(stepsbydate$steps)[4],digits = 1)
 stepmedian<-format(summary(stepsbydate$steps)[3],digits = 1)
 ```
 
-The mean number of steps per day is `r stepmean` and the median is `r stepmedian`.
+The mean number of steps per day is 10766 and the median is 10765.
 
 ## What is the average daily activity pattern?
 
-```{r}
+
+```r
 stepsbytime<-aggregate( steps ~ interval, x, mean )
 plot(stepsbytime, type="l")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 maxstepsinterval<-stepsbytime$interval[which.max(stepsbytime$steps)]
 ```
-The maximum average steps occurred during interval `r maxstepsinterval`.
+The maximum average steps occurred during interval 835.
 
 ## Imputing missing values
 
-```{r}
+
+```r
 numnas<-summary(x$steps)["NA's"]
 ximputed<-x
 naintervals<-ximputed$interval[is.na(ximputed$steps)]
@@ -49,11 +63,14 @@ stepmedianimputed<-format(summary(stepsbydateimputed$steps)[3],digits = 1)
 hist(stepsbydateimputed$steps)
 ```
 
-There are `r numnas` missing values.
-The new mean steps per day is `r stepmeanimputed` and the median is `r stepmedianimputed`. 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+There are 2304 missing values.
+The new mean steps per day is 10766 and the median is 10766. 
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+
+```r
 library(lattice)
 weekdayholder<-weekdays(ximputed$date)
 weekendholder<-weekdayholder=="Saturday" | weekdayholder=="Sunday"
@@ -62,4 +79,6 @@ levels(ximputed$weekend)<-c("weekday", "weekend")
 stepsbytimeweekend<-aggregate( steps ~ interval + weekend, ximputed, mean )
 xyplot(steps ~ interval | weekend, data = stepsbytimeweekend, type="l", layout=c(1,2))
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
